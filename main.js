@@ -8,36 +8,122 @@
 
     let __webpack_modules__ = {};
     let __webpack_cache__ = {};
-    function __webpack_require__(moduleID) {
-        if (typeof __webpack_cache__[moduleID] !== 'undefined') {
-            return __webpack_cache__[moduleID].exports;
+
+    function __webpack_require__(moduleId) {
+        // Check if module is in cache
+        var cachedModule = __webpack_cache__[moduleId];
+        if (cachedModule !== undefined) {
+            return cachedModule.exports;
         }
-        var module = (__webpack_cache__[moduleID] = __webpack_require__.moduleFactory({
-            id: moduleID,
-            loaded: false,
-            exports: {},
-        }));
-        __webpack_modules__[moduleID](module, module.exports, __webpack_require__);
-        module.loaded = true;
+
+        // Create a new module (and put it into the cache)
+        var module = __webpack_cache__[moduleId] = {
+            id: moduleId,
+            loaded : true,
+            exports: {}
+        };
+	
+        // Execute the module function
+        __webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+
+        // Return the exports of the module
         return module.exports;
     }
 
-    __webpack_require__.modules = __webpack_modules__;
-    __webpack_require__.cache = __webpack_cache__;
-    __webpack_require__.moduleFactory = (obj) => {
-        Object.defineProperty(obj, Symbol.toStringTag, {
-            value: 'Module',
-        });
-        Object.defineProperty(obj, '__esModule', {
-            value: true,
-        });
-        return obj;
-    };
+    Object.assign(__webpack_require__, {
+        // Async module
+        a: (module, body, hasAwait) => {
+            var queue;
+            hasAwait && ((queue = []).d = 1);
+            var depQueues = new Set();
+            var exports = module.exports;
+            var currentDeps;
+            var outerResolve;
+            var reject;
+            var promise = new Promise((resolve, rej) => {
+                reject = rej;
+                outerResolve = resolve;
+            });
+             promise[webpackExports] = exports;
+            promise[webpackQueues] = (fn) => (queue && fn(queue), depQueues.forEach(fn), promise["catch"](x => {}));
+            module.exports = promise;
+            body((deps) => {
+                currentDeps = wrapDeps(deps);
+                var fn;
+                var getResult = () => (currentDeps.map((d) => {
+                    if(d[webpackError]) throw d[webpackError];
+                    return d[webpackExports];
+                }))
+                    var promise = new Promise((resolve) => {
+                    fn = () => (resolve(getResult));
+                    fn.r = 0;
+                    var fnQueue = (q) => (q !== queue && !depQueues.has(q) && (depQueues.add(q), q && !q.d && (fn.r++, q.push(fn))));
+                    currentDeps.map((dep) => (dep[webpackQueues](fnQueue)));
+                });
+                return fn.r ? promise : getResult();
+            }, (err) => ((err ? reject(promise[webpackError] = err) : outerResolve(exports)), resolveQueue(queue)));
+            queue && (queue.d = 0);
+        },
+        // publicPath
+        p: "",
+        // compatGetDefaultExport
+        n : (e) => {
+            var t = e && e.__esModule ? ()=>e.default : ()=>e;
+            return __webpack_require__.d(t, {
+                a: t
+            }),
+            t
+        },
+        // modules
+        m : __webpack_modules__,
+        // cache
+        c : __webpack_cache__,
+        // definePropertyGetters
+        d : (exports, definition) => {
+            for(var key in definition) {
+                if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+                    Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+                }
+            }
+        },
+        //makeNamespaceObject
+        r : (obj) => {
+            Object.defineProperty(obj, Symbol.toStringTag, {
+                value: 'Module',
+            });
+            Object.defineProperty(obj, '__esModule', {
+                value: true,
+            });
+            return obj;
+        },
+        // createFakeNamespaceObject
+        t : () => {},
+        // hasOwnProperty
+        o: (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop)),
+        // nodeModuleDecorator
+        nmd: (e) =>(e.paths = [], e.children || (e.children = []), e),
+        // instantiateWasm
+        v: (exports, wasmModuleId, wasmModuleHash, importsObj) => {
+            var req = fetch(__webpack_require__.p + "" + wasmModuleHash + ".wasm");
+            if (typeof WebAssembly.instantiateStreaming === 'function') {
+                return WebAssembly.instantiateStreaming(req, importsObj)
+                    .then((res) => (Object.assign(exports, res.instance.exports)));
+            }
+            return req
+                .then((x) => (x.arrayBuffer()))
+                .then((bytes) => (WebAssembly.instantiate(bytes, importsObj)))
+                .then((res) => (Object.assign(exports, res.instance.exports)));
+        },
+
+    });
+
     if (config.open === true) {
         self[config.wpName] = self[config.wpName] || [];
         self[config.wpName].__webpack_require__ = __webpack_require__
     }
+
     if (config.splitter === true) {
+
         self[config.wpName] = self[config.wpName] || [];
         let originalPush = self[config.wpName].push;
         self[config.wpName].push = function (entry) {
@@ -60,9 +146,11 @@
                 Object.assign(__webpack_modules__, modules);
             }
         };
-    }
 
+    }
     if(config.defaultModule) {
+        __webpack_require__.entryModuleId = config.defaultModule
         __webpack_require__(config.defaultModule)
     }
+    
 })();

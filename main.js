@@ -1,8 +1,8 @@
 (() => {
     let config = {
-        wpName : 'webpackJsonp',
-        splitter : true,
-        open : true,
+        wpName: 'webpackJsonp',
+        splitter: true,
+        open: true,
         //defaultModule : 2000
     }
 
@@ -19,10 +19,10 @@
         // Create a new module (and put it into the cache)
         var module = __webpack_cache__[moduleId] = {
             id: moduleId,
-            loaded : true,
+            loaded: true,
             exports: {}
         };
-	
+
         // Execute the module function
         __webpack_modules__[moduleId](module, module.exports, __webpack_require__);
 
@@ -44,17 +44,17 @@
                 reject = rej;
                 outerResolve = resolve;
             });
-             promise[webpackExports] = exports;
+            promise[webpackExports] = exports;
             promise[webpackQueues] = (fn) => (queue && fn(queue), depQueues.forEach(fn), promise["catch"](x => {}));
             module.exports = promise;
             body((deps) => {
                 currentDeps = wrapDeps(deps);
                 var fn;
                 var getResult = () => (currentDeps.map((d) => {
-                    if(d[webpackError]) throw d[webpackError];
+                    if (d[webpackError]) throw d[webpackError];
                     return d[webpackExports];
                 }))
-                    var promise = new Promise((resolve) => {
+                var promise = new Promise((resolve) => {
                     fn = () => (resolve(getResult));
                     fn.r = 0;
                     var fnQueue = (q) => (q !== queue && !depQueues.has(q) && (depQueues.add(q), q && !q.d && (fn.r++, q.push(fn))));
@@ -67,27 +67,30 @@
         // publicPath
         p: "",
         // compatGetDefaultExport
-        n : (e) => {
-            var t = e && e.__esModule ? ()=>e.default : ()=>e;
+        n: (e) => {
+            var t = e && e.__esModule ? () => e.default : () => e;
             return __webpack_require__.d(t, {
-                a: t
-            }),
-            t
+                    a: t
+                }),
+                t
         },
         // modules
-        m : __webpack_modules__,
+        m: __webpack_modules__,
         // cache
-        c : __webpack_cache__,
+        c: __webpack_cache__,
         // definePropertyGetters
-        d : (exports, definition) => {
-            for(var key in definition) {
-                if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
-                    Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+        d: (exports, definition) => {
+            for (var key in definition) {
+                if (__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+                    Object.defineProperty(exports, key, {
+                        enumerable: true,
+                        get: definition[key]
+                    });
                 }
             }
         },
         //makeNamespaceObject
-        r : (obj) => {
+        r: (obj) => {
             Object.defineProperty(obj, Symbol.toStringTag, {
                 value: 'Module',
             });
@@ -97,11 +100,11 @@
             return obj;
         },
         // createFakeNamespaceObject
-        t : () => {},
+        t: () => {},
         // hasOwnProperty
         o: (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop)),
         // nodeModuleDecorator
-        nmd: (e) =>(e.paths = [], e.children || (e.children = []), e),
+        nmd: (e) => (e.paths = [], e.children || (e.children = []), e),
         // instantiateWasm
         v: (exports, wasmModuleId, wasmModuleHash, importsObj) => {
             var req = fetch(__webpack_require__.p + "" + wasmModuleHash + ".wasm");
@@ -114,15 +117,63 @@
                 .then((bytes) => (WebAssembly.instantiate(bytes, importsObj)))
                 .then((res) => (Object.assign(exports, res.instance.exports)));
         },
-	//global
-	g: globalThis,
-	// ensureChunk
-	e: (chunkId) => {
-		return Promise.all(Object.keys(__webpack_require__.f).reduce((promises, key) => {
-			__webpack_require__.f[key](chunkId, promises);
-			return promises;
-		}, []));
-   	},   
+        //global
+        g: globalThis,
+        // ensureChunk
+        e: (chunkId) => {
+            return Promise.all(Object.keys(__webpack_require__.f).reduce((promises, key) => {
+                __webpack_require__.f[key](chunkId, promises);
+                return promises;
+            }, []));
+        },
+        // loadScript
+        l: (url, done, key, chunkId) => {
+            if (inProgress[url]) {
+                inProgress[url].push(done);
+                return;
+            }
+            var script, needAttach;
+            if (key !== undefined) {
+                var scripts = document.getElementsByTagName("script");
+                for (var i = 0; i < scripts.length; i++) {
+                    var s = scripts[i];
+                    if (s.getAttribute("src") == url) {
+                        script = s;
+                        break;
+                    }
+                }
+            }
+            if (!script) {
+                needAttach = true;
+                script = document.createElement('script');
+
+                script.charset = 'utf-8';
+                script.timeout = 120;
+                if (__webpack_require__.nc) {
+                    script.setAttribute("nonce", __webpack_require__.nc);
+                }
+
+                script.src = url;
+            }
+            inProgress[url] = [done];
+            var onScriptComplete = (prev, event) => {
+                // avoid mem leaks in IE.
+                script.onerror = script.onload = null;
+                clearTimeout(timeout);
+                var doneFns = inProgress[url];
+                delete inProgress[url];
+                script.parentNode && script.parentNode.removeChild(script);
+                doneFns && doneFns.forEach((fn) => (fn(event)));
+                if (prev) return prev(event);
+            }
+            var timeout = setTimeout(onScriptComplete.bind(null, undefined, {
+                type: 'timeout',
+                target: script
+            }), 120000);
+            script.onerror = onScriptComplete.bind(null, script.onerror);
+            script.onload = onScriptComplete.bind(null, script.onload);
+            needAttach && document.head.appendChild(script);
+        },
     })
 
     if (config.open === true) {
@@ -134,7 +185,7 @@
 
         self[config.wpName] = self[config.wpName] || [];
         let originalPush = self[config.wpName].push;
-        self[config.wpName].push = function (entry) {
+        self[config.wpName].push = function(entry) {
             let chunkIds = entry[0];
             let modules = entry[1];
             if (entry[2]) {
@@ -156,9 +207,9 @@
         };
 
     }
-    if(config.defaultModule) {
+    if (config.defaultModule) {
         __webpack_require__.entryModuleId = config.defaultModule
         __webpack_require__(config.defaultModule)
     }
-    
+
 })();

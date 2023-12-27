@@ -1,7 +1,7 @@
 (() => {
     let config = {
         wpName : 'webpackJsonp',
-        splitter : false
+        splitter : true
     }
 
     let __webpack_modules__ = {};

@@ -1,28 +1,29 @@
 (() => {
     let config = {
         wpName : 'webpackJsonp',
-        splitter : true
+        splitter : true,
+        //defaultModule : 2000
     }
 
     let __webpack_modules__ = {};
     let __webpack_cache__ = {};
-    function require(moduleID) {
+    function __webpack_require__(moduleID) {
         if (typeof __webpack_cache__[moduleID] !== 'undefined') {
             return __webpack_cache__[moduleID].exports;
         }
-        var module = (__webpack_cache__[moduleID] = require.moduleFactory({
+        var module = (__webpack_cache__[moduleID] = __webpack_require__.moduleFactory({
             id: moduleID,
             loaded: false,
             exports: {},
         }));
-        __webpack_modules__[moduleID](module, module.exports, require);
+        __webpack_modules__[moduleID](module, module.exports, __webpack_require__);
         module.loaded = true;
         return module.exports;
     }
 
-    require.modules = __webpack_modules__;
-    require.cache = __webpack_cache__;
-    require.moduleFactory = (obj) => {
+    __webpack_require__.modules = __webpack_modules__;
+    __webpack_require__.cache = __webpack_cache__;
+    __webpack_require__.moduleFactory = (obj) => {
         Object.defineProperty(obj, Symbol.toStringTag, {
             value: 'Module',
         });
@@ -55,5 +56,9 @@
                 Object.assign(__webpack_modules__, modules);
             }
         };
+    }
+
+    if(config.defaultModule) {
+        __webpack_require__(config.defaultModule)
     }
 })();

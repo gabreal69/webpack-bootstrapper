@@ -2,6 +2,7 @@
     let config = {
         wpName : 'webpackJsonp',
         splitter : true,
+        open : true,
         //defaultModule : 2000
     }
 
@@ -32,7 +33,10 @@
         });
         return obj;
     };
-
+    if (config.open === true) {
+        self[config.wpName] = self[config.wpName] || [];
+        self[config.wpName].__webpack_require__ = __webpack_require__
+    }
     if (config.splitter === true) {
         self[config.wpName] = self[config.wpName] || [];
         let originalPush = self[config.wpName].push;

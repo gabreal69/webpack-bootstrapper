@@ -114,8 +114,16 @@
                 .then((bytes) => (WebAssembly.instantiate(bytes, importsObj)))
                 .then((res) => (Object.assign(exports, res.instance.exports)));
         },
-
-    });
+	//global
+	g: globalThis,
+	// ensureChunk
+	e: (chunkId) => {
+		return Promise.all(Object.keys(__webpack_require__.f).reduce((promises, key) => {
+			__webpack_require__.f[key](chunkId, promises);
+			return promises;
+		}, []));
+   	},   
+    })
 
     if (config.open === true) {
         self[config.wpName] = self[config.wpName] || [];

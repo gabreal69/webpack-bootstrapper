@@ -1,4 +1,4 @@
-# webpack but browser thing
+# webpack bootstrapper
 ```
 // Example modules
 webpackJsonp.push([[0], {

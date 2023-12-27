@@ -8,7 +8,7 @@
     let __webpack_cache__ = {};
     function require(moduleID) {
         if (typeof __webpack_cache__[moduleID] !== 'undefined') {
-            return __webpack_cache__[moduleID];
+            return __webpack_cache__[moduleID].exports;
         }
         var module = (__webpack_cache__[moduleID] = require.moduleFactory({
             id: moduleID,
@@ -17,7 +17,7 @@
         }));
         __webpack_modules__[moduleID](module, module.exports, require);
         module.loaded = true;
-        return module;
+        return module.exports;
     }
 
     require.modules = __webpack_modules__;
